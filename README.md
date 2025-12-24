@@ -11,8 +11,7 @@ This project provides a set of Python scripts to scrape songs from an Amazon Mus
 ## Prerequisites
 
 *   Python 3.x
-*   [Brave Browser](https://brave.com/)
-*   Google Chrome (Selenium requires Chrome/Chromium drivers, `webdriver-manager` handles this, but having Chrome installed is often helpful)
+*   Any chromium based browser. (Selenium requires Chrome/Chromium drivers, `webdriver-manager` handles this, but having Chrome installed is often helpful. I have used [Brave Browser](https://brave.com/). To use any other browser please change BRAVE_PATH variable value with your browser's path.)
 
 ## Installation
 
