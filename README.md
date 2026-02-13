@@ -66,3 +66,7 @@ If your Brave installation is in a different location (or if you are on macOS/Li
 *   **Automation & Terms of Service:** Automated scraping and interaction with websites may violate their Terms of Service. Use this tool responsibly and at your own risk.
 *   **Accuracy:** The matching process relies on search results. It may not always pick the exact version of the song you want (e.g., live versions vs. studio versions).
 *   **Maintenance:** Web interface changes by Amazon or YouTube can break these scripts at any time.
+
+## About
+
+This project was built by vive coding using Google gemini
