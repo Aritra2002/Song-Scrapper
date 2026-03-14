@@ -20,7 +20,7 @@ YOUTUBE_MUSIC_URL = "https://music.youtube.com"
 
 # --- PERSISTENT PROFILE CONFIGURATION ---
 # Set this to your Brave User Data path if you want to stay logged in.
-# Usually: r"C:\Users\Aritra Naskar\AppData\Local\BraveSoftware\Brave-Browser\User Data"
+# Usually: r"C:\Users\<YourUsername>\AppData\Local\BraveSoftware\Brave-Browser\User Data"
 # WARNING: Brave must be COMPLETELY CLOSED for this to work.
 USER_DATA_DIR = None # Set this to your browser's user data path to stay logged in
 PROFILE_NAME = "Default"
