@@ -8,7 +8,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 # ==========================================
@@ -18,6 +17,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 BRAVE_PATH = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 SONG_FILE = "amazon_songs_backup.txt"
 YOUTUBE_MUSIC_URL = "https://music.youtube.com"
+
+# --- PERSISTENT PROFILE CONFIGURATION ---
+# Set this to your Brave User Data path if you want to stay logged in.
+# Usually: r"C:\Users\Aritra Naskar\AppData\Local\BraveSoftware\Brave-Browser\User Data"
+# WARNING: Brave must be COMPLETELY CLOSED for this to work.
+USER_DATA_DIR = None # Set this to your browser's user data path to stay logged in
+PROFILE_NAME = "Default"
 
 # Constants
 MIN_SLEEP_TIME = 2
@@ -60,31 +66,38 @@ def get_songs(filename: str) -> List[str]:
 
 def setup_driver() -> webdriver.Chrome:
     """
-    Set up and configure Chrome WebDriver for Brave browser with stealth options.
-    
-    Returns:
-        webdriver.Chrome: Configured Chrome WebDriver instance
+    Set up and configure Chrome WebDriver for Brave browser with advanced stealth.
     """
     options = Options()
     options.binary_location = BRAVE_PATH
     options.add_argument("--mute-audio") 
     options.add_argument("--start-maximized")
     
-    # STEALTH MODE
+    # Advanced Stealth: Disable automation detection
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
+    # Use a real user agent
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36")
 
-    print("Initializing Driver for Brave (Version ~143)...")
-    try:
-        driver_path = ChromeDriverManager(driver_version="143.0.7499.110").install()
-    except Exception as e:
-        print(f" -> Exact version match failed. Trying generic version 143... Error: {e}")
-        driver_path = ChromeDriverManager(driver_version="143").install()
-        
-    service_obj = Service(driver_path)
-    driver = webdriver.Chrome(service=service_obj, options=options)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    # If User Data is provided, we use the real browser profile (very reliable for login)
+    if USER_DATA_DIR:
+        print(f"Using browser profile: {USER_DATA_DIR}")
+        options.add_argument(f"--user-data-dir={USER_DATA_DIR}")
+        options.add_argument(f"--profile-directory={PROFILE_NAME}")
+
+    print("Initializing Driver for Brave with advanced stealth...")
+    # Selenium (4.6+) automatically manages the matching driver version
+    driver = webdriver.Chrome(options=options)
+    
+    # Execute CDP command to hide 'navigator.webdriver' before any page loads
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            })
+        """
+    })
     
     return driver
 

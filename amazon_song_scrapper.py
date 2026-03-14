@@ -5,25 +5,24 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from webdriver_manager.chrome import ChromeDriverManager
-
 
 # --- CONFIGURATION ---
 BRAVE_PATH = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 OUTPUT_FILE = "amazon_songs_backup.txt"
-AMAZON_MUSIC_URL = "https://music.amazon.com/"
+AMAZON_MUSIC_URL = "https://music.amazon.in/"
 
 # Constants
 SCROLL_DELAY = 5
 FINAL_SCROLL_DELAY = 4
 
+
 def setup_driver() -> webdriver.Chrome:
     """
     Set up and configure Chrome WebDriver for Brave browser.
-    
+
     Returns:
         webdriver.Chrome: Configured Chrome WebDriver instance
-        
+
     Raises:
         Exception: If driver setup fails
     """
@@ -33,13 +32,14 @@ def setup_driver() -> webdriver.Chrome:
     options.add_experimental_option("detach", True)
 
     try:
-        service = Service(ChromeDriverManager(driver_version="143").install())
+        # Selenium (4.6+) automatically manages the matching driver version
+        driver = webdriver.Chrome(options=options)
     except Exception as e:
-        print(f"Auto-match failed. Using default driver... Error: {e}")
-        service = Service(ChromeDriverManager().install())
-    
-    driver = webdriver.Chrome(service=service, options=options)
+        print(f"Error initializing driver: {e}")
+        raise
+
     return driver
+
 
 def auto_scroll(driver: webdriver.Chrome) -> None:
     """
@@ -101,7 +101,14 @@ def scrape_songs() -> None:
     try:
         driver = setup_driver()
         print("Opening Amazon Music...")
-        driver.get(AMAZON_MUSIC_URL)
+        try:
+            driver.get(AMAZON_MUSIC_URL)
+        except Exception as nav_e:
+            if "net::ERR_NAME_NOT_RESOLVED" in str(nav_e):
+                print("\n[!] Error: Could not resolve Amazon Music URL. Please check your internet connection or DNS settings.")
+            else:
+                print(f"\n[!] Navigation Error: {nav_e}")
+            return
 
         print("\n" + "="*60)
         print("INSTRUCTIONS:")

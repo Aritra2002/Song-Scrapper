@@ -2,39 +2,26 @@
 Common utilities for web scraping scripts.
 """
 import time
-from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 # Constants
 BRAVE_PATH = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
-CHROME_VERSION = "143"
 
 
 def setup_chrome_driver(
     binary_location: str = BRAVE_PATH,
-    chrome_version: str = CHROME_VERSION,
     stealth_mode: bool = False,
     detach: bool = False,
     mute_audio: bool = False,
-    start_maximized: bool = False
+    start_maximized: bool = False,
+    user_data_dir: str = None,
+    profile_directory: str = "Default"
 ) -> webdriver.Chrome:
     """
     Set up and configure Chrome WebDriver with various options.
-    
-    Args:
-        binary_location: Path to browser executable
-        chrome_version: Chrome driver version to use
-        stealth_mode: Enable stealth mode options
-        detach: Keep browser open after script ends
-        mute_audio: Mute browser audio
-        start_maximized: Start browser maximized
-        
-    Returns:
-        webdriver.Chrome: Configured Chrome WebDriver instance
     """
     options = Options()
     options.binary_location = binary_location
@@ -48,26 +35,30 @@ def setup_chrome_driver(
     if start_maximized:
         options.add_argument("--start-maximized")
     
+    if user_data_dir:
+        options.add_argument(f"--user-data-dir={user_data_dir}")
+        options.add_argument(f"--profile-directory={profile_directory}")
+    
     if stealth_mode:
-        # STEALTH MODE options
+        # Advanced Stealth: Disable automation flags
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
+        # Use a modern, non-headless User Agent
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36")
 
-    try:
-        # Try exact version first
-        service = Service(ChromeDriverManager(driver_version=chrome_version).install())
-    except Exception as e:
-        print(f"Exact version {chrome_version} failed. Using default... Error: {e}")
-        service = Service(ChromeDriverManager().install())
-    
-    driver = webdriver.Chrome(service=service, options=options)
+    # Let Selenium (4.6+) automatically manage the matching driver version
+    driver = webdriver.Chrome(options=options)
     
     if stealth_mode:
-        # Additional stealth script
-        driver.execute_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
-        )
+        # Advanced Stealth: Execute CDP command to hide 'navigator.webdriver' before any page loads
+        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": """
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                })
+            """
+        })
     
     return driver
 
