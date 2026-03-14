@@ -1,72 +1,60 @@
-# Amazon Music to YouTube Music Transfer Tool
+# Amazon Music to YouTube Music Transfer Tool 
 
-This project provides a set of Python scripts to scrape songs from an Amazon Music playlist and add them to your "Liked Songs" on YouTube Music. It uses Selenium with the Brave browser for automation.
+A set of Python scripts to scrape your liked songs/playlists from Amazon Music and automatically add them to your YouTube Music "Liked Songs".
 
-## Components
+## 🛠️ Prerequisites
 
-1.  **`amazon_song_scrapper.py`**: Scrapes song titles and artists from an Amazon Music playlist. It handles auto-scrolling and parsing of the page content, saving the results to a text file.
-2.  **`yt_mover.py`**: Reads the scraped song list and automates the process of searching for each song on YouTube Music and adding it to your "Liked Songs" library.
-3.  **`web_utils.py`**: A utility module containing helper functions for WebDriver setup and scrolling (intended for shared use/refactoring).
-
-## Prerequisites
-
-*   Python 3.x
-*   Any chromium based browser. (Selenium requires Chrome/Chromium drivers, `webdriver-manager` handles this, but having Chrome installed is often helpful. I have used [Brave Browser](https://brave.com/). To use any other browser please change BRAVE_PATH variable value with your browser's path.)
-
-## Installation
-
-1.  Clone this repository or download the source code.
-2.  Install the required Python packages:
-
+1.  **Python 3.7+** installed.
+2.  **Any chromium based browser**. (Selenium requires Chrome/Chromium drivers, `webdriver-manager` handles this, but having Chrome installed is often helpful. I have used [Brave Browser](https://brave.com/). To use any other browser please change BRAVE_PATH variable value with your browser's path.) 
+3.  **Dependencies**: Install required packages via terminal:
     ```bash
     pip install -r requirements.txt
     ```
 
-## Configuration
+## 🚀 Setup & Usage
 
-**Important:** The scripts currently have a hardcoded path to the Brave browser executable.
+### 1. Scrape Amazon Music
+Run the scrapper to generate a list of your songs.
+```bash
+python amazon_song_scrapper.py
+```
+- A Brave window will open.
+- **Action Required**: Log in to Amazon Music and navigate to your desired playlist/liked songs.
+- Return to the terminal and press **ENTER**.
+- The script will scroll and save your songs to `amazon_songs_backup.txt`.
 
-*   **Default Path:** `C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe`
+### 2. Move to YouTube Music
+Run the mover to search and "Like" these songs on YouTube Music.
+```bash
+python yt_mover.py
+```
+- **Action Required**: Log in to YouTube Music if prompted.
+- The script will search for each song and click "Add to liked songs".
 
-If your Brave installation is in a different location (or if you are on macOS/Linux), you **must** update the `BRAVE_PATH` variable in both `amazon_song_scrapper.py` and `yt_mover.py`.
+---
 
-## Usage
+## 🛡️ Bypassing "Automated Browser" Detection (YouTube)
 
-### Step 1: Scrape Songs from Amazon Music
+YouTube often blocks logins from automated browsers. To fix this, we use your **Real Brave Profile**.
 
-1.  Run the scraper script:
-    ```bash
-    python amazon_song_scrapper.py
-    ```
-2.  A Brave browser window will open and navigate to Amazon Music.
-3.  **Log in** to your Amazon account manually.
-4.  Navigate to the specific **Playlist** you want to transfer.
-5.  Return to your terminal/command prompt and press **ENTER**.
-6.  The script will automatically scroll through the playlist to load all songs and then scrape the data.
-7.  When finished, the songs will be saved to `amazon_songs_backup.txt`.
-8.  Close the browser or press Enter if prompted.
+### Step 1: Find your User Data Path
+On Windows, your Brave User Data path is usually:
+`C:\Users\<YourUsername>\AppData\Local\BraveSoftware\Brave-Browser\User Data`
 
-### Step 2: Add Songs to YouTube Music
+### Step 2: Update `yt_mover.py`
+Open `yt_mover.py` and update the `USER_DATA_DIR` variable:
+```python
+# Example for user
+USER_DATA_DIR = r"C:\Users\<YourUsername>\AppData\Local\BraveSoftware\Brave-Browser\User Data"
+```
 
-1.  Run the mover script:
-    ```bash
-    python yt_mover.py
-    ```
-2.  A Brave browser window will open and navigate to YouTube Music.
-3.  **Log in** to your Google/YouTube account manually.
-4.  Return to your terminal/command prompt and press **ENTER**.
-5.  The script will read `amazon_songs_backup.txt` and process each song:
-    *   It searches for the song on YouTube Music.
-    *   It attempts to "Like" the first valid result.
-    *   It skips songs that are already liked.
-6.  Monitor the terminal for progress and any errors.
+### Step 3: Close Brave Completely
+**CRITICAL**: You must close all open Brave windows before running `yt_mover.py`. If Brave is open, the script will fail to load your profile.
 
-## Disclaimer
+---
 
-*   **Automation & Terms of Service:** Automated scraping and interaction with websites may violate their Terms of Service. Use this tool responsibly and at your own risk.
-*   **Accuracy:** The matching process relies on search results. It may not always pick the exact version of the song you want (e.g., live versions vs. studio versions).
-*   **Maintenance:** Web interface changes by Amazon or YouTube can break these scripts at any time.
+## 📝 Troubleshooting
 
-## About
-
-This project was built by vive coding using Google gemini
+- **Driver Errors**: The scripts use Selenium's built-in Manager to automatically match your Brave version. Ensure you have an active internet connection on the first run.
+- **DNS/Network Errors**: If you see `ERR_NAME_NOT_RESOLVED`, check your internet connection or VPN settings.
+- **Song Not Found**: The mover tries to find the best match. If a song is very obscure, it may skip it.
