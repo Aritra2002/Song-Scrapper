@@ -1,3 +1,7 @@
+
+[![Vibe Coding](https://img.shields.io/badge/Built%20with-Vibe%20Coding-bc13fe?style=for-the-badge&logo=google-gemini)](https://gemini.google.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
 # Music Transfer & Scraping Tools
 
 A collection of Python scripts designed to scrape, transfer, and manage your music libraries across Amazon Music, YouTube Music, and Spotify. 
