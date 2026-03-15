@@ -1,60 +1,66 @@
-# Amazon Music to YouTube Music Transfer Tool 
+# Music Transfer & Scraping Tools
 
-A set of Python scripts to scrape your liked songs/playlists from Amazon Music and automatically add them to your YouTube Music "Liked Songs".
+A collection of Python scripts designed to scrape, transfer, and manage your music libraries across Amazon Music, YouTube Music, and Spotify. 
 
-## 🛠️ Prerequisites
-
-1.  **Python 3.7+** installed.
-2.  **Any chromium based browser**. (Selenium requires Chrome/Chromium drivers, `webdriver-manager` handles this, but having Chrome installed is often helpful. I have used [Brave Browser](https://brave.com/). To use any other browser please change BRAVE_PATH variable value with your browser's path.) 
-3.  **Dependencies**: Install required packages via terminal:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-## 🚀 Setup & Usage
-
-### 1. Scrape Amazon Music
-Run the scrapper to generate a list of your songs.
-```bash
-python amazon_song_scrapper.py
-```
-- A Brave window will open.
-- **Action Required**: Log in to Amazon Music and navigate to your desired playlist/liked songs.
-- Return to the terminal and press **ENTER**.
-- The script will scroll and save your songs to `amazon_songs_backup.txt`.
-
-### 2. Move to YouTube Music
-Run the mover to search and "Like" these songs on YouTube Music.
-```bash
-python yt_mover.py
-```
-- **Action Required**: Log in to YouTube Music if prompted.
-- The script will search for each song and click "Add to liked songs".
+This project was developed by **vive coding** using **Gemini 3 Pro** to automate the tedious process of migrating playlists between streaming platforms.
 
 ---
 
-## 🛡️ Bypassing "Automated Browser" Detection (YouTube)
+## ⚠️ Disclaimer
+**Important:** These scripts use web automation (Selenium) to interact with music platforms. 
+- Results are **not 100% accurate** due to differences in song metadata across platforms.
+- **Human intervention is required** to review the final results of every script (e.g., checking if the correct song was "Liked" or after scrapping songs all the songs were added in produced text file or has the right name and other details).
+- Use these tools responsibly and ensure you are logged in to the respective platforms.
 
-YouTube often blocks logins from automated browsers. To fix this, we use your **Real Brave Profile**.
+---
 
-### Step 1: Find your User Data Path
-On Windows, your Brave User Data path is usually:
-`C:\Users\<YourUsername>\AppData\Local\BraveSoftware\Brave-Browser\User Data`
+## 🛠️ Prerequisites
 
-### Step 2: Update `yt_mover.py`
-Open `yt_mover.py` and update the `USER_DATA_DIR` variable:
-```python
-# Example for user
-USER_DATA_DIR = r"C:\Users\<YourUsername>\AppData\Local\BraveSoftware\Brave-Browser\User Data"
-```
+Before running the scripts, ensure you have the following:
 
-### Step 3: Close Brave Completely
-**CRITICAL**: You must close all open Brave windows before running `yt_mover.py`. If Brave is open, the script will fail to load your profile.
+1.  **Python 3.7+**: [Download Python](https://www.python.org/downloads/)
+2.  **Brave Browser**: The scripts are configured for Brave by default.
+    - If you use Chrome or another Chromium browser, update the `BRAVE_PATH` in `web_utils.py`.
+3.  **Dependencies**: Install the required Python packages:
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **Browser Profile (Optional but Recommended)**: 
+    - To stay logged in and bypass automation detection, you can provide your browser's `User Data` path in the script configurations. This is usually: r"C:\Users\<Username>\AppData\Local\BraveSoftware\Brave-Browser\User Data".
+    - **Note:** The browser must be **completely closed** for the profile to load successfully.
+
+---
+
+## 🚀 Usage Instructions
+
+### 1. Scraping Your Music
+Extract your "Liked Songs" or playlists into a text file.
+
+*   **Amazon Music**: Run `amazon_song_scrapper.py`. 
+    - Log in and navigate to your playlist when prompted.
+*   **YouTube Music**: Run `yt_song_scrapper.py`.
+    - It will automatically attempt to scrape your "Liked Songs" using your profile.
+
+### 2. Moving Your Music
+Transfer songs from a text file to a new platform.
+
+*   **To YouTube Music**: Run `yt_mover.py <filename.txt>`.
+    - Example: `python yt_mover.py amazon_songs.txt`
+*   **To Spotify**: Run `spotify_mover.py <filename.txt>`.
+    - Example: `python spotify_mover.py yt_songs.txt`
+
+---
+
+## ⚙️ Configuration
+
+Each script contains a **Configuration Section** at the top. You may need to update:
+- `USER_DATA_DIR`: Path to your browser's user data (e.g., `C:\Users\<Username>\AppData\Local\BraveSoftware\Brave-Browser\User Data`).
+- `PROFILE_DIRECTORY`: Usually `"Default"`.
+- `OUTPUT_FILE`: The name of the text file where songs will be saved.
 
 ---
 
 ## 📝 Troubleshooting
-
-- **Driver Errors**: The scripts use Selenium's built-in Manager to automatically match your Brave version. Ensure you have an active internet connection on the first run.
-- **DNS/Network Errors**: If you see `ERR_NAME_NOT_RESOLVED`, check your internet connection or VPN settings.
-- **Song Not Found**: The mover tries to find the best match. If a song is very obscure, it may skip it.
+- **Automation Detection**: If a platform blocks you, ensure `stealth_mode=True` is set in the script (it is by default).
+- **Driver Issues**: Selenium 4.6+ handles drivers automatically. Ensure you have an active internet connection on the first run.
+- **Selector Errors**: Web structures change frequently. If a script fails to find buttons, the CSS selectors may need updating.
